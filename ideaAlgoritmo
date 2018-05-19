@@ -1,0 +1,27 @@
+-> Scrapear (url, nivel)
+    -> leer todas las etiquetas 'a'
+    -> inicializo variable urls_to_save
+    -> repetir para cada etiqueta 'a'
+        -> verifico si la url no existe ya en la base de datos: TRue
+            -> guardo en url_to_save un objeto con el 
+                href 
+                title de la etiqueta
+                nivel+1
+                visitar: si nivel + 1 > 3 devolver false, caso contrario true.
+            -> guardo en la base de datos
+        
+    -> devuelvo etiqueta title
+
+
+-> abrir base de datos
+-> asigno a la variable corte = 100
+-> repetir la cantidad de veces de corte
+    -> Abrir base de datos
+    -> Traer la primera url con atributo visitar con valor true
+    -> Titulo = Ejecutar la función Scrapear (url.url, url.nivel)
+    -> Actualizo el título de la url
+    -> Actualizo el visitar: False
+    -> guardo la url con el cambio efectuado
+-> Cierro la base de datos
+
+

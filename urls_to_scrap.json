@@ -1,0 +1,7 @@
+{
+    "sites": [
+        {"url": "http://clarin.com", "name": "clarin"},
+        {"url": "http://eldia.com", "name": "eldia"},
+        {"url": "http://pagina12.com.ar", "name": "pagina12"}
+    ]
+}
