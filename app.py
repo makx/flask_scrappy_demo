@@ -1,5 +1,6 @@
 import json
 from flask import Flask
+from flask import ( render_template, jsonify )
 from flask_pymongo import PyMongo
 from scrapy.crawler import CrawlerRunner
 from demo_scraper import QuoteSpider
@@ -42,42 +43,46 @@ def testmongo():
 
 @app.route('/scrapp')
 def scrapp():
-    eventual = crawl_runner.crawl(LoggerSpider)
-    eventual.addCallback(finished_scrape)
-    return 'Termino el scrapp'
-
-@app.route('/gotoscrapp')
-def runScrapper():
-    global scrape_complete
     global scrape_in_progress
-    global quotes_list
-    global limit
-    url = mongo.db.urls.find_one({'visit': False})
-    eventual = crawl_runner.crawl(QuoteSpider, quotes_list=quotes_list, mongo=mongo, url=url)
-    eventual.addCallback(finished_scrape)
-    # result= mongo.db.urls.update_one({'url':url['url']}, {'$set': {'visit': False}})
-    # while not scrape_complete:
-    #     url = mongo.db.urls.find_one({'visit': True})
-    #     scrape_in_progress = True
-    #     if (url is None) | ((limit-1) == 0):
-    #         scrape_in_progress= False
-    #         scrape_complete= True
-    #     else:
-    #         eventual = crawl_runner.crawl(QuoteSpider, quotes_list=quotes_list, mongo=mongo, url=url)
-    #         eventual.addCallback(finished_scrape)
-    #         result= mongo.db.urls.update_one({'url':url['url']}, {'$set': {'visit': False}})
-    #     limit -= 1
-    # scrape_complete = True
-    return 'Terminó tuti'
+    global scrape_complete
+
+    if not scrape_in_progress:
+        scrape_in_progress = True
+        # start the crawler and execute a callback when complete
+        eventual = crawl_runner.crawl(LoggerSpider)
+        eventual.addCallback(finished_scrape)
+    
+    return render_template('index.html', scrape_complete=scrape_complete, scrape_in_progress=scrape_in_progress)
+
+# @app.route('/gotoscrapp')
+# def runScrapper():
+#     global scrape_complete
+#     global scrape_in_progress
+#     global quotes_list
+#     global limit
+#     url = mongo.db.urls.find_one({'visit': False})
+#     eventual = crawl_runner.crawl(QuoteSpider, quotes_list=quotes_list, mongo=mongo, url=url)
+#     eventual.addCallback(finished_scrape)
+#     # result= mongo.db.urls.update_one({'url':url['url']}, {'$set': {'visit': False}})
+#     # while not scrape_complete:
+#     #     url = mongo.db.urls.find_one({'visit': True})
+#     #     scrape_in_progress = True
+#     #     if (url is None) | ((limit-1) == 0):
+#     #         scrape_in_progress= False
+#     #         scrape_complete= True
+#     #     else:
+#     #         eventual = crawl_runner.crawl(QuoteSpider, quotes_list=quotes_list, mongo=mongo, url=url)
+#     #         eventual.addCallback(finished_scrape)
+#     #         result= mongo.db.urls.update_one({'url':url['url']}, {'$set': {'visit': False}})
+#     #     limit -= 1
+#     # scrape_complete = True
+#     return 'Terminó tuti'
 
 @app.route('/crawl')
 def crawl_for_quotes():
     """
     Scrapear títulos de noticias
     """
-    global scrape_in_progress
-    global scrape_complete
-    global url_to_scrap
 
     if not scrape_in_progress:
         scrape_in_progress = True
@@ -101,14 +106,18 @@ def get_results():
     return 'Scrape Still Progresssss'
 
 def finished_scrape(null):
-    pprint(' fue por el finish ')
-    """
-    A callback that is fired after the scrape has completed.
-    Set a flag to allow display the results from /results
-    """
+    pprint('Callback fin del scrapping')
     global scrape_complete
     scrape_complete = True
 
+@app.route('/status')
+def get_status():
+    global scrape_complete
+    count = mongo.db.urls.count()
+    return jsonify({
+        'scrapping': scrape_complete,
+        'cantidad': count
+    })
 
 if __name__=='__main__':
     from sys import stdout

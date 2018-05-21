@@ -3,44 +3,36 @@ import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import Rule, CrawlSpider
 from items import UrlItem
+from scrapperSettings import settings
 
 
-class LoggerSpider(scrapy.spiders.Spider):
+class LoggerSpider(CrawlSpider):
     # The name of the spider
-    name = "datalogger"
+    name = "urllogger"
 
     # The domains that are allowed (links to other domains are skipped)
     allowed_domains = []
 
     # The URLs to start with
-    start_urls = ["http://www.celerative.com"]
+    start_urls = ["http://www.eldia.com"]
 
     EXTENSIONS = {
         'scrapy.extensions.closespider.CloseSpider': 500
     }
 
-    custom_settings = {
-        'CLOSESPIDER_TIMEOUT': 10,
-        'ITEM_PIPELINES': {
-            'pipelines.MongoPipeline': 1,
-        }
-    }
-
-    ITEM_PIPELINES = {
-        'MongoPipeline': 300,
-    }
+    custom_settings = settings
 
     # This spider has one rule: extract all (unique and canonicalized) links, follow them and parse them using the parse_items method
-    # rules = [
-    #     Rule(
-    #         LinkExtractor(
-    #             canonicalize=True,
-    #             unique=True
-    #         ),
-    #         follow=True,
-    #         callback="parse_items"
-    #     )
-    # ]
+    rules = [
+        Rule(
+            LinkExtractor(
+                canonicalize=True,
+                unique=True
+            ),
+            follow=True,
+            callback="parse_items"
+        )
+    ]
 
     # Method which starts the requests by visiting all URLs specified in start_urls
     def start_requests(self):
@@ -48,16 +40,19 @@ class LoggerSpider(scrapy.spiders.Spider):
             yield scrapy.Request(url, callback=self.parse, dont_filter=True)
 
     # Method for parsing items
-    def parse(self, response):
-        print('entro aqua')
+    def parse_items(self, response):
+        # print('entro en el parse item')
         # links = LinkExtractor(canonicalize=False, unique=True).extract_links(response)
         # print(links)
-        item = UrlItem()
-        item['name'] = 'Lala'
-        print(item.keys())
-        # item['url'] = 'LALA '
-        # item['name'] = response.xpath('/html/head/title/text()').extract()
-        yield item
+        item = UrlItem(
+            url=response.url,
+            title=response.xpath('/html/head/title/text()').extract_first(),
+            description=response.xpath('/html/head/meta[@name="description"]/@content').extract_first   ()
+        )
+        print('nana ')
+        print(item)
+        return item
+
         # The list of items that are found on the particular page
         # items = []
         # Only extract canonicalized and unique links (with respect to the current page)
