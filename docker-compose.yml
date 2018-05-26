@@ -10,6 +10,8 @@ services:
       - "9000:9000"
     links:
       - mongodb
+    env_file:
+      - .env
   mongodb:
     image: mongo
     ports:

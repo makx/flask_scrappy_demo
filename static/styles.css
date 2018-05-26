@@ -1,0 +1,28 @@
+body {
+    font-family: 'Arial';
+    font-size: 16px;
+    height: 100%;
+}
+#items-table {
+    width: 100%;
+    table-layout: fixed;
+
+}
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+a, a:visited, a:hover, a:active {
+    background-color: green;
+    padding:4px 10px;
+    text-align: center;
+    width: 100px;
+    height: 65px;
+    vertical-align: center;
+    text-decoration: none;
+    color: white;
+}

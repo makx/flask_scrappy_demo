@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Trabajo final - Adquisición y almacenamiento de datos</title>
+        <link rel="stylesheet" type="text/css" href="static/styles.css">
+    </head>
+    <body>
+        <section>
+            <h1>Trabajo final - Adquisición y almacenamiento de datos</h1>
+        </section>
+        <section>
+                <a href="#" id="button-stop">Detener Spider</a>
+                <a href='./scrapp' id="button-start" style="display: none">Activar Spider</a>
+                <a href="./" id="button-stop">Volver a configuración</a>
+        </section>
+        <section>
+            <dl>
+                <dt>Scraping Status</dt>
+                <dd id="estado">{% if scrape_in_progress %} <En progreso {% else %} Detenido {% endif %}</dd>
+                <dt>Nuevos </dt>
+                <dd id="cantidad">-</dd>
+                <dt>Totales guardados en la base de datos</dd>
+                <dd id="cantidad-total"></dt>
+            </dl>
+
+            <h3>
+                Últimos 4 items alcanzador por el spider
+            </h3>
+            <p>
+                Nota: No representa exactamente a los últimos 4. Cada medio segundo se hace una verificación y agarra el último item que se agregó y lo agrega al top de esta lista.
+            </p>
+            <table id="items-table" cellpadding="2" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th style="width: 250px;">
+                            Título
+                        </th>
+                        <th style="width: 350px;">
+                            Url
+                        </th>
+                        <th>
+                            Descripción
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="no-items-loaded" colspan="3">
+                            No se han cargado items
+                        </td>
+                    </tr>
+                </tbody>
+            </table> 
+        </section>
+        <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+        <script>
+            $(function() {
+                var repeater;
+                var cantidadInicial;
+                
+                $("#button-stop").click(function(e) {
+                    e.preventDefault()
+                    $.getJSON('./stopspider', function(data, status) {
+                        $("#button-stop").css("display", "none");
+                        $("#button-start").css("display", "inline");
+                    })
+                })
+
+                function getStatus() {
+                    $.getJSON('./status',function(data, status){
+                        if(!cantidadInicial) {
+                            cantidadInicial= parseInt(data.count)
+                        }
+                        $('#cantidad').text(parseInt(data.count) - cantidadInicial)
+                        $('#cantidad-total').text(parseInt(data.count))
+                        if(data.newAdded.length) {
+                            loadLatestItem(data.newAdded[0])
+                        }
+                        if(!data.scrapping) {
+                            $('#estado').text('Completado')
+                            $("#button-stop").css("display", "none");
+                            $("#button-start").css("display", "inline");
+                            clearInterval(repeater);
+                        }
+                    })
+                    .fail(function( jqxhr, textStatus, error ) {
+                        $('#estado').text('Ocurrió un error')
+                        console.log('ocurrió un error, se terminó');
+                    });
+                }
+
+                function loadLatestItem(newItem) {
+                    var items= $("#no-items-loaded");
+                    if($(items).length) {
+                        $(items).remove();
+                    }
+                    var newRow = $("<tr />").append(
+                        $("<td >").text(newItem['title'])
+                    ).append(
+                        $("<td >").text(newItem['url'])
+                    ).append(
+                        $("<td >").text(newItem['description'])
+                    )
+                    $("#items-table tbody").prepend(newRow);
+                    if($("#items-table tbody tr").length > 4) {
+                        $("#items-table tbody tr").last().remove();
+                    }
+                }
+                function run() {
+                    repeater= setInterval(getStatus, 500)
+                }
+
+                setTimeout(run, 2000)
+                
+            }
+            )
+        </script>
+    </body>    
+</html>

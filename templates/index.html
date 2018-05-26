@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Trabajo final - Adquisición y almacenamiento de datos</title>
+        <link rel="stylesheet" type="text/css" href="static/styles.css">
     </head>
     <body>
         <section>
@@ -11,10 +12,36 @@
             <dl>
                 <dt>Scraping Status</dt>
                 <dd>{% if scrape_in_progress %} En progreso {% else %} Detenido {% endif %}</dd>
-                <dt>Cantidad</dt>
-                <dd>-</dd>
             </dl>
+            <section>
+                <h3>Configuración </h3>
+                <dt>Url inicial (la ruta debe estar completa)</dt>
+                <dt><input type="text" name="url" value="http://eldia.com.ar" /></dt>
+            </section>
+            <br>
+            <br>
+            {% if not scrape_in_progress %}
+                <a id="spider-start" href='#'>Iniciar Spider</a>
+            {% endif %}
         </section>
+        <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+        <script>
+            $(function(){
+                $("#spider-start").click(function(){
+                    var urlInicial= $("input[type=text][name=url]").val()
+                    var expression= /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
+                    var regex= new RegExp(expression);
+                    if(urlInicial && urlInicial.match(expression)) {
+                        window.location.href= "./scrapp?url="+urlInicial;
+                    } else {
+                        alert('la url debe ser válida');
+                    }
+                    
+                })
+            })
+        </script>
     </body>    
 </html>
-

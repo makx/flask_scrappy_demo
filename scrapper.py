@@ -13,8 +13,6 @@ class LoggerSpider(CrawlSpider):
     # The domains that are allowed (links to other domains are skipped)
     allowed_domains = []
 
-    # The URLs to start with
-    start_urls = ["http://www.eldia.com"]
 
     EXTENSIONS = {
         'scrapy.extensions.closespider.CloseSpider': 500
@@ -36,8 +34,9 @@ class LoggerSpider(CrawlSpider):
 
     # Method which starts the requests by visiting all URLs specified in start_urls
     def start_requests(self):
-        for url in self.start_urls:
-            yield scrapy.Request(url, callback=self.parse, dont_filter=True)
+        # for url in self.urlInicial:
+        #     yield scrapy.Request(url, callback=self.parse, dont_filter=True)
+        yield scrapy.Request(self.url_inicial, callback=self.parse, dont_filter=True)
 
     # Method for parsing items
     def parse_items(self, response):
