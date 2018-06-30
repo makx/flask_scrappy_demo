@@ -13,7 +13,13 @@ Hasta llegar a un criterio de corte.
 Es necesario tener instalado docker y docker-compose
 
 ## Configuración
-El proyecto viene configurado para que funcione. Algo que debe configurarse es el criterio de corte. El defecto es 30. Por lo que para hacer una prueba más larga debe configurarse un criterio de corte mayor.
+Crear un archivo .env con las siguientes variables: 
+SPIDER_TIME_LIMIT=30
+MONGO_HOST=mongodb
+MONGO_COLLECTION=adquisicion_db
+
+Ya viene con el repo el volumen que tiene creada la base de datos y la collection. Por lo que se deberá crear. Lo que es necesario modificar a los efectos de hacer un prueba más o menos largo es el SPIDER_TIME_LIMIT que se define el criterio de corte en segundos. 
+
 Nota: Si luego de buildear la aplicación se cambia alguna variable de entorno entonces debe ejecutarse
 
 `docker-compose up --build --force-recreate`
