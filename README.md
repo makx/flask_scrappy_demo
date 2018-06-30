@@ -20,7 +20,7 @@ Nota: Si luego de buildear la aplicación se cambia alguna variable de entorno e
 
 ## Instalación
 
-`git clone https://github.com/makx/flask_scrapy_demo.git .`
+`git clone https://github.com/makx/flask_scrapy_mongodb_tp_final.git .`
 
 `docker-compose up`
 
